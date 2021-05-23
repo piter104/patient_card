@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title> Karta Pacjenta </title>
+
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+
+<body>
+<header>
+    <nav class="navigation">
+        <a class="navigation__link navigation__link-homepage" th:href="@{/index}">Strona główna</a>
+        <div class="navigation__link-position">
+            <div>
+                <a class="navigation__link" th:href="@{/}">Historia<br/>Pacjenta</a>
+            </div>
+            <div>
+                <a class="navigation__link" th:href="@{/}">Obserwacje</a>
+            </div>
+        </div>
+    </nav>
+</header>
+<main>
+    <table class="content-table">
+        <tr>
+            <td style="border-right: solid 2px #342E37;"><b>Imię i Nazwisko</b></td>
+            <td th:text="${patient.name}">Imię i Nazwisko</td>
+        </tr>
+        <tr>
+            <td style="border-right: solid 2px #342E37;"><b>Płeć</b></td>
+            <td th:text="${patient.gender}">Płeć</td>
+        </tr>
+        <tr>
+            <td style="border-right: solid 2px #342E37;"><b>Data Urodzenia</b></td>
+            <td th:text="${patient.birthDate}">Data Urodzenia</td>
+        </tr>
+    </table>
+</main>
+
+</body>
+</html>

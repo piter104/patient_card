@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang="pl" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title> Karta Pacjenta </title>
+
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+</head>
+
+<body>
+<header>
+    <nav class="navigation">
+        <a class="navigation__link navigation__link-homepage" th:href="@{/index}">Strona główna</a>
+        <div class="navigation__link-position">
+            <div>
+                <a class="navigation__link" th:href="@{/}">Historia<br/>Pacjenta</a>
+            </div>
+            <div>
+                <a class="navigation__link" th:href="@{/}">Obserwacje</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="container">
+    <table id="rentalOfficeList" class="content-table">
+        <tr class="table__head">
+            <th>Imię i nazwisko</th>
+            <th></th>
+        </tr>
+        <tr th:each="patient : ${patients}">
+            <td th:text="${patient.name}">Imię i nazwisko</td>
+            <!--            <td><a th:href="@{/{id} (id = ${patient.identifier})}">Szczegóły Pacjenta</a></td>-->
+            <td><a th:href="@{/{id} (id = ${5})}">Szczegóły Pacjenta</a></td>
+        </tr>
+    </table>
+</main>
+</body>
+</html>

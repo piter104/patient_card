@@ -1,66 +1,108 @@
 package com.joder.iwm.karta_pacjenta.Controller;
 
-import com.joder.iwm.karta_pacjenta.Model.Patient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.MedicationRequest;
+import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r4.model.Patient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class PatientController {
+    private static List<Patient> getPatients() {
+        final String uri = "http://localhost:8080/baseR4/Patient";
+        List<Patient> patients = new ArrayList<>();
+
+        RestTemplate restTemplate = new RestTemplate();
+        String result = restTemplate.getForObject(uri, String.class);
+
+        FhirContext ctx = FhirContext.forR4();
+
+        // Instantiate a new parser
+        IParser parser = ctx.newJsonParser();
+
+        // Parse it
+        Bundle parsed = parser.parseResource(Bundle.class, result);
+
+        for (int i = 0; i < parsed.getEntry().size(); i++) {
+            Patient patient = (Patient) parsed.getEntry().get(i).getResource();
+//            patient.getName().get(0).getGiven().toString().replaceAll("[^a-zA-Z]", " "));
+//            patient.getName().get(0).getFamily().replaceAll("[^a-zA-Z]", ""));
+            patients.add(patient);
+        }
+        return patients;
+    }
+
+    private static List<Observation> getObservations() {
+        final String uri = "http://localhost:8080/baseR4/Observation";
+        List<Observation> observations = new ArrayList<>();
+
+        RestTemplate restTemplate = new RestTemplate();
+        String result = restTemplate.getForObject(uri, String.class);
+
+        FhirContext ctx = FhirContext.forR4();
+
+        // Instantiate a new parser
+        IParser parser = ctx.newJsonParser();
+
+        // Parse it
+        Bundle parsed = parser.parseResource(Bundle.class, result);
+
+        for (int i = 0; i < parsed.getEntry().size(); i++) {
+            Observation observation = (Observation) parsed.getEntry().get(i).getResource();
+            observations.add(observation);
+        }
+        return observations;
+    }
+
+    private static List<MedicationRequest> getMedicationRequests() {
+        final String uri = "http://localhost:8080/baseR4/MedicationRequest";
+        List<MedicationRequest> medicationRequests = new ArrayList<>();
+
+        RestTemplate restTemplate = new RestTemplate();
+        String result = restTemplate.getForObject(uri, String.class);
+
+        FhirContext ctx = FhirContext.forR4();
+
+        // Instantiate a new parser
+        IParser parser = ctx.newJsonParser();
+
+        // Parse it
+        Bundle parsed = parser.parseResource(Bundle.class, result);
+
+        for (int i = 0; i < parsed.getEntry().size(); i++) {
+            MedicationRequest medicationRequest = (MedicationRequest) parsed.getEntry().get(i).getResource();
+            medicationRequests.add(medicationRequest);
+        }
+        return medicationRequests;
+    }
+
     @GetMapping(value = "/")
     public String patientList(Model model) {
+        getObservations();
+        getMedicationRequests();
         model.addAttribute("patients", getPatients());
         return "index";
     }
 
     @GetMapping(value = "/{id}")
-    public String patientDetails(@PathVariable(value = "id") int id, Model model) {
-        model.addAttribute("patient", getPatients().get(id));
+    public String patientDetails(@PathVariable(value = "id") String id, Model model) {
+        List<Patient> patients = getPatients();
+        for (Patient patient : patients) {
+            String val = patient.getIdentifier().get(0).getValue();
+            if (val.equals(id)) {
+                model.addAttribute("patient", patient);
+                break;
+            }
+        }
         return "patient-details";
     }
-
-    private static List<Patient> getPatients() {
-        final String uri = "http://localhost:8080/baseR4/Patient?_pretty=true";
-        List<Patient> patients = new ArrayList<>();
-
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.getForObject(uri, String.class);
-        try {
-            JSONObject obj = new JSONObject(result);
-
-            JSONArray arr = obj.getJSONArray("entry"); // notice that `"posts": [...]`
-            for (int i = 0; i < arr.length(); i++) {
-                Patient patient = new Patient();
-                JSONObject arr2 = arr.getJSONObject(i).getJSONObject("resource");
-                JSONArray arr3 = arr2.getJSONArray("name");
-
-                patient.setIdentifier(i);
-                for (int j = 0; j < arr3.length(); j++) {
-                    String name = arr3.getJSONObject(j).getString("given");
-                    name = name.replaceAll("[^a-zA-Z]", " ");
-                    String family = arr3.getJSONObject(j).getString("family");
-                    family = family.replaceAll("[^a-zA-Z]", " ");
-                    patient.setName(name + " " + family);
-                }
-                patient.setGender(arr2.getString("gender"));
-                patient.setBirthDate(LocalDate.parse(arr2.getString("birthDate")));
-                patients.add(patient);
-                // System.out.println(arr2.getJSONArray("address"));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        //  System.out.println(result);
-        return patients;
-    }
-
 }

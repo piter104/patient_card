@@ -28,12 +28,14 @@
 <main class="container">
     <table id="rentalOfficeList" class="content-table">
         <tr class="table__head">
-            <th>Imię i nazwisko</th>
+            <th>Imię</th>
+            <th>Nazwisko</th>
             <th></th>
         </tr>
         <tr th:each="patient : ${patients}">
-            <td th:text="${patient.name}">Imię i nazwisko</td>
-            <td><a th:href="@{/{id} (id = ${patient.identifier})}">Szczegóły Pacjenta</a></td>
+            <td th:text="${patient.getName().get(0).getGiven().get(0).toString()}">Imię</td>
+            <td th:text="${patient.getName().get(0).getFamily()}">Nazwisko</td>
+            <td><a th:href="@{/{id} (id = ${patient.getIdentifier().get(0).getValue()})}">Szczegóły Pacjenta</a></td>
         </tr>
     </table>
 </main>

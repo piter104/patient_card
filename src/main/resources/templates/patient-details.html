@@ -27,8 +27,12 @@
 <main>
     <table class="content-table">
         <tr>
-            <td style="border-right: solid 2px #342E37;"><b>Imię i Nazwisko</b></td>
-            <td th:text="${patient.name}">Imię i Nazwisko</td>
+            <td style="border-right: solid 2px #342E37;"><b>Imię</b></td>
+            <td th:text="${patient.getName().get(0).getGiven().get(0).toString()}">Imię</td>
+        </tr>
+        <tr>
+            <td style="border-right: solid 2px #342E37;"><b>Nazwisko</b></td>
+            <td th:text="${patient.getName().get(0).getFamily()}">Nazwisko</td>
         </tr>
         <tr>
             <td style="border-right: solid 2px #342E37;"><b>Płeć</b></td>

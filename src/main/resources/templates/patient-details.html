@@ -43,6 +43,18 @@
             <td th:text="${patient?.getBirthDate}">Data Urodzenia</td>
         </tr>
     </table>
+    <table class="content-table">
+        <tr class="table__head">
+            <th>Nazwa</th>
+            <th>Wartość</th>
+            <th>Jednostka</th>
+        </tr>
+        <tr th:each="observation : ${patient?.getObservations}">
+            <td th:text="${observation?.getName}">Nazwa</td>
+            <td th:text="${observation?.getValue}">Wartość</td>
+            <td th:text="${observation?.getUnit}">Jednostka</td>
+        </tr>
+    </table>
 </main>
 
 </body>

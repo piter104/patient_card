@@ -18,7 +18,4 @@ public class Timing {
         if (periodUnit != null)
             this.periodUnit = periodUnit.getDefinition();
     }
-
-    public Timing() {
-    }
 }

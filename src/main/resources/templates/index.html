@@ -26,7 +26,11 @@
 </header>
 
 <main class="container">
-    <table id="rentalOfficeList" class="content-table">
+    <form action="#" method="post" th:action="@{/search}">
+        <input th:name="search" type="text"/>
+        <input type="submit" value="szukaj"/>
+    </form>
+    <table class="content-table">
         <tr class="table__head">
             <th>Imię</th>
             <th>Nazwisko</th>

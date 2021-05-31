@@ -1,8 +1,11 @@
 package com.joder.iwm.karta_pacjenta.Model;
 
+import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
 
+@Data
 public class MedicationRequestPretty {
     private String id;
     private String name;

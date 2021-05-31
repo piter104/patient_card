@@ -1,10 +1,12 @@
 package com.joder.iwm.karta_pacjenta.Model;
 
+import lombok.Data;
 import org.hl7.fhir.r4.model.DateTimeType;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
+@Data
 public class ObservationPretty {
     private String id;
     private String name;

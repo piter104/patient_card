@@ -16,65 +16,93 @@ import java.util.List;
 @Service
 public class ResourceService {
     public static List<PatientPretty> getPatients() {
-        final String uri = "http://localhost:8080/baseR4/Patient";
+        String uri = "http://localhost:8080/baseR4/Patient";
         List<PatientPretty> patients = new ArrayList<>();
+        String firstUrl = "";
+        String url = "";
+        while (true) {
+            if (url != "") {
+                uri = url;
+            }
+            RestTemplate restTemplate = new RestTemplate();
+            String result = restTemplate.getForObject(uri, String.class);
 
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.getForObject(uri, String.class);
+            FhirContext ctx = FhirContext.forR4();
 
-        FhirContext ctx = FhirContext.forR4();
+            // Instantiate a new parser
+            IParser parser = ctx.newJsonParser();
 
-        // Instantiate a new parser
-        IParser parser = ctx.newJsonParser();
-
-        // Parse it
-        Bundle parsed = parser.parseResource(Bundle.class, result);
-
-        for (int i = 0; i < parsed.getEntry().size(); i++) {
-            Patient patient = (Patient) parsed.getEntry().get(i).getResource();
-            String id = patient.getId();
-            id = id.replace("http://localhost:8080/baseR4/Patient/", "");
-            id = id.replace("/_history/1", "");
-            PatientPretty patientPretty = new PatientPretty(
-                    id,
-                    patient.getName().get(0).getGiven().get(0).toString(),
-                    patient.getName().get(0).getFamily(),
-                    patient.getBirthDate().toString(),
-                    patient.getGender().toString());
-            patients.add(patientPretty);
+            // Parse it
+            Bundle parsed = parser.parseResource(Bundle.class, result);
+            url = parsed.getLink().get(1).getUrl();
+            if (url.equals(firstUrl))
+                break;
+            if (patients.size() == 0)
+                firstUrl = url;
+            for (int i = 0; i < parsed.getEntry().size(); i++) {
+                Patient patient = (Patient) parsed.getEntry().get(i).getResource();
+                String id = patient.getId();
+                id = id.replace("http://localhost:8080/baseR4/Patient/", "");
+                id = id.replace("/_history/1", "");
+                PatientPretty patientPretty = new PatientPretty(
+                        id,
+                        patient.getName().get(0).getGiven().get(0).toString(),
+                        patient.getName().get(0).getFamily(),
+                        patient.getBirthDate().toString(),
+                        patient.getGender().toString());
+                patients.add(patientPretty);
+            }
         }
         return patients;
     }
 
 
     public static List<ObservationPretty> getObservations() {
-        final String uri = "http://localhost:8080/baseR4/Observation";
+        String uri = "http://localhost:8080/baseR4/Observation";
         List<ObservationPretty> observations = new ArrayList<>();
-
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.getForObject(uri, String.class);
-
-
+        String firstUrl = "";
+        String url = "";
         FhirContext ctx = FhirContext.forR4();
 
         // Instantiate a new parser
         IParser parser = ctx.newJsonParser();
 
-        // Parse it
-        Bundle parsed = parser.parseResource(Bundle.class, result);
 
-        for (int i = 0; i < parsed.getEntry().size(); i++) {
-            Observation observation = (Observation) parsed.getEntry().get(i).getResource();
-            String id = observation.getSubject().getReference();
-            id = id.replace("Patient/", "");
-            ObservationPretty observationPretty = new ObservationPretty(
-                    id,
-                    observation.getCode().getText(),
-                    observation.getEffectiveDateTimeType(),
-                    observation.getValueQuantity().getValue(),
-                    observation.getValueQuantity().getUnit()
-            );
-            observations.add(observationPretty);
+        while (true) {
+            if (url != "") {
+                uri = url;
+            }
+            RestTemplate restTemplate = new RestTemplate();
+            String result = restTemplate.getForObject(uri, String.class);
+
+            // Parse it
+            Bundle parsed = parser.parseResource(Bundle.class, result);
+            url = parsed.getLink().get(1).getUrl();
+            if (url.equals(firstUrl))
+                break;
+            if (observations.size() == 0)
+                firstUrl = url;
+
+            for (int i = 0; i < parsed.getEntry().size(); i++) {
+                try {
+                    Observation observation = (Observation) parsed.getEntry().get(i).getResource();
+                    String id = observation.getSubject().getReference();
+                    id = id.replace("Patient/", "");
+                    ObservationPretty observationPretty = new ObservationPretty(
+                            id,
+                            observation.getCode().getText(),
+                            observation.getEffectiveDateTimeType(),
+                            observation.getValueQuantity()
+                    );
+                    observations.add(observationPretty);
+
+                } catch (Exception e) {
+
+                }
+            }
+            if (observations.size() > 50) {
+                break;
+            }
         }
         return observations;
     }

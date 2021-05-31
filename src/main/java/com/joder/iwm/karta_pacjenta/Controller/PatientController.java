@@ -40,7 +40,6 @@ public class PatientController {
             String val = patient.getId();
             if (val.equals(id)) {
                 for (ObservationPretty observation : observations) {
-                    Boolean aa = observation.getId().equals(id);
                     if (observation.getId().equals(id)) {
                         observationPrettyList.add(observation);
                     }

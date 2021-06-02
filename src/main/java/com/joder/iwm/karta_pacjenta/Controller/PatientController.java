@@ -55,8 +55,6 @@ public class PatientController {
                 break;
             }
         }
-        model.addAttribute("observation", resourceService.getObservations());
-        model.addAttribute("medicationRequest", resourceService.getMedicationRequests());
         return "patient-details";
     }
 

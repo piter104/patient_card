@@ -55,6 +55,24 @@
             <td th:text="${observation?.getUnit}">Jednostka</td>
         </tr>
     </table>
+    <table class="content-table">
+        <tr class="table__head">
+            <th>Nazwa</th>
+            <th>Data</th>
+            <th>Ilość</th>
+            <th>Częstość</th>
+            <th>Okres</th>
+            <th>Jednostka</th>
+        </tr>
+        <tr th:each="medicationRequest : ${patient?.getMedicationRequests}">
+            <td th:text="${medicationRequest?.getName}">Nazwa</td>
+            <td th:text="${medicationRequest?.getDateTime}">Data</td>
+            <td th:text="${medicationRequest?.getDoseQuantity}">Ilość</td>
+            <td th:text="${medicationRequest?.getFrequency}">Częstość</td>
+            <td th:text="${medicationRequest?.getPeriod}">Data</td>
+            <td th:text="${medicationRequest?.getPeriodUnit}">Data</td>
+        </tr>
+    </table>
 </main>
 
 </body>

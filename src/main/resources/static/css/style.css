@@ -319,6 +319,10 @@ textarea {
     font-size: 20px;
 }
 
+.form {
+margin-top: 500px
+}
+
 .content-table {
     border-collapse: collapse;
     margin: 25px 0;

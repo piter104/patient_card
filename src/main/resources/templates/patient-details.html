@@ -22,8 +22,9 @@
         <input th:field="*{startDate}" type="date"/> <br>
         <label>Data Końcowa</label> <br>
         <input th:field="*{endDate}" type="date"/><br>
-        <input class="page-button" type="submit" value="filtruj"/><br>
+        <input class="page-button" type="submit" value="filtruj dane"/><br>
     </form>
+    <br>
     <table class="content-table">
         <tr>
             <td style="border-right: solid 2px #342E37;"><b>Imię</b></td>
@@ -42,6 +43,15 @@
             <td th:text="${patient?.getToPrintDate}">Data Urodzenia</td>
         </tr>
     </table>
+    <br>
+    <form action="#" method="post" th:object="${filter}" th:action="@{/{id}/chart (id = ${id})}">
+        <label>Data Początkowa</label> <br>
+        <input th:field="*{startDate}" type="date"/> <br>
+        <label>Data Końcowa</label> <br>
+        <input th:field="*{endDate}" type="date"/><br>
+        <input class="page-button" type="submit" value="Wyświetl Wykres Wagi"/><br>
+    </form>
+    <br>
     <table class="content-table">
         <tr class="table__head">
             <th>Nazwa</th>

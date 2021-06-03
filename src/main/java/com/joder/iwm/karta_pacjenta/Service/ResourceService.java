@@ -219,12 +219,12 @@ public class ResourceService {
         ZonedDateTime endDate = null;
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        if (filter.getStartDate() != "") {
+        if (filter.getStartDate() != "" && filter.getStartDate() != null) {
             LocalDate localStartDate = LocalDate.parse(filter.getStartDate(), formatter);
 
             startDate = localStartDate.atStartOfDay(ZoneId.systemDefault());
         }
-        if (filter.getEndDate() != "") {
+        if (filter.getEndDate() != "" && filter.getEndDate() != null) {
             LocalDate localEndDate = LocalDate.parse(filter.getEndDate(), formatter);
 
             endDate = localEndDate.atStartOfDay(ZoneId.systemDefault());

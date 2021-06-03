@@ -1,9 +1,7 @@
 package com.joder.iwm.karta_pacjenta.Controller;
 
 import ca.uhn.fhir.rest.annotation.RequiredParam;
-import com.joder.iwm.karta_pacjenta.Model.MedicationRequestPretty;
-import com.joder.iwm.karta_pacjenta.Model.ObservationPretty;
-import com.joder.iwm.karta_pacjenta.Model.PatientPretty;
+import com.joder.iwm.karta_pacjenta.Model.Filter;
 import com.joder.iwm.karta_pacjenta.Service.ResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,9 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 public class PatientController {
@@ -29,48 +24,25 @@ public class PatientController {
     }
 
     @GetMapping(value = "/{id}")
-    public String patientDetails(@PathVariable(value = "id") String id, Model model) {
-        List<PatientPretty> patients = resourceService.getPatients();
-        List<ObservationPretty> observations = resourceService.getObservations();
-        List<MedicationRequestPretty> medicationRequests = resourceService.getMedicationRequests();
-        List<ObservationPretty> observationPrettyList = new ArrayList<>();
-        List<MedicationRequestPretty> medicationRequestPrettyList = new ArrayList<>();
-
-        for (PatientPretty patient : patients) {
-            String val = patient.getId();
-            if (val.equals(id)) {
-                for (ObservationPretty observation : observations) {
-                    if (observation.getId().equals(id)) {
-                        observationPrettyList.add(observation);
-                    }
-                }
-                for (MedicationRequestPretty medicationRequest : medicationRequests) {
-                    if (medicationRequest.getId().equals(id)) {
-                        medicationRequestPrettyList.add(medicationRequest);
-                    }
-                }
-                patient.setObservations(observationPrettyList);
-                patient.setMedicationRequests(medicationRequestPrettyList);
-                model.addAttribute("patient", patient);
-                break;
-            }
-        }
+    public String patientDetails(@PathVariable(value = "id") String id, @RequiredParam(name = "filter") Filter filter, Model model) {
+        model.addAttribute("patient", resourceService.getAllPatientInfo(id));
+        model.addAttribute("filter", new Filter());
+        model.addAttribute("id", id);
         return "patient-details";
     }
 
     @PostMapping(value = "/search")
     public String patientSearch(@RequiredParam(name = "search") String search, Model model) {
-        List<PatientPretty> patients = new ArrayList<>();
-        for (PatientPretty patient : resourceService.getPatients()) {
-            if (
-                    patient.getName().toLowerCase().contains(search.toLowerCase())
-                            ||
-                            patient.getSurname().toLowerCase().contains(search.toLowerCase())) {
-                patients.add(patient);
-            }
-        }
         model.addAttribute("search", new String());
-        model.addAttribute("patients", patients);
+        model.addAttribute("patients", resourceService.getSearchedPatients(search));
         return "index";
+    }
+
+    @PostMapping(value = "/{id}/filter")
+    public String patientFilter(@RequiredParam(name = "filter") Filter filter, Model model) {
+        model.addAttribute("patient", resourceService.getFilteredPatient(filter));
+        model.addAttribute("filter", new Filter());
+        model.addAttribute("id", filter.getId());
+        return "patient-details";
     }
 }

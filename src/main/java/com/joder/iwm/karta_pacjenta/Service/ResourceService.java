@@ -10,6 +10,10 @@ import org.hl7.fhir.r4.model.Patient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +27,7 @@ public class ResourceService {
     public static List<PatientPretty> getPatients() {
         String uri = "http://localhost:8080/baseR4/Patient";
         List<PatientPretty> patients = new ArrayList<>();
-        Integer total;
+        Integer total = -1;
 
         while (true) {
             RestTemplate restTemplate = new RestTemplate();
@@ -32,8 +36,8 @@ public class ResourceService {
             // Parse it
             Bundle parsed = parser.parseResource(Bundle.class, result);
             uri = parsed.getLink().get(1).getUrl();
-
-            total = parsed.getTotal();
+            if (total == -1)
+                total = parsed.getTotal();
 
             for (int i = 0; i < parsed.getEntry().size(); i++) {
                 Patient patient = (Patient) parsed.getEntry().get(i).getResource();
@@ -49,7 +53,7 @@ public class ResourceService {
                 patients.add(patientPretty);
             }
 
-            if (patients.size() > total) {
+            if (patients.size() >= total) {
                 break;
             }
         }
@@ -61,7 +65,7 @@ public class ResourceService {
         String uri = "http://localhost:8080/baseR4/Observation";
         List<ObservationPretty> observations = new ArrayList<>();
 
-        Integer total;
+        Integer total = -1;
 
         while (true) {
             RestTemplate restTemplate = new RestTemplate();
@@ -71,7 +75,8 @@ public class ResourceService {
             Bundle parsed = parser.parseResource(Bundle.class, result);
             uri = parsed.getLink().get(1).getUrl();
 
-            total = parsed.getTotal();
+            if (total == -1)
+                total = parsed.getTotal();
 
             for (int i = 0; i < parsed.getEntry().size(); i++) {
                 try {
@@ -90,7 +95,7 @@ public class ResourceService {
 
                 }
             }
-            if (observations.size() > total) {
+            if (observations.size() >= total) {
                 break;
             }
         }
@@ -100,7 +105,7 @@ public class ResourceService {
     public static List<MedicationRequestPretty> getMedicationRequests() {
         String uri = "http://localhost:8080/baseR4/MedicationRequest";
         List<MedicationRequestPretty> medicationRequestPretties = new ArrayList<>();
-        Integer total;
+        Integer total = -1;
 
         while (true) {
 
@@ -111,7 +116,8 @@ public class ResourceService {
             Bundle parsed = parser.parseResource(Bundle.class, result);
             uri = parsed.getLink().get(1).getUrl();
 
-            total = parsed.getTotal();
+            if (total == -1)
+                total = parsed.getTotal();
 
             for (int i = 0; i < parsed.getEntry().size(); i++) {
                 MedicationRequest medicationRequest = (MedicationRequest) parsed.getEntry().get(i).getResource();
@@ -151,10 +157,95 @@ public class ResourceService {
 
                 }
             }
-            if (medicationRequestPretties.size() > total) {
+            if (medicationRequestPretties.size() >= total) {
                 break;
             }
         }
         return medicationRequestPretties;
+    }
+
+    public PatientPretty getAllPatientInfo(String id) {
+        List<PatientPretty> patients = getPatients();
+        List<ObservationPretty> observations = getObservations();
+        List<MedicationRequestPretty> medicationRequests = getMedicationRequests();
+
+        List<ObservationPretty> observationPrettyList = new ArrayList<>();
+        List<MedicationRequestPretty> medicationRequestPrettyList = new ArrayList<>();
+
+        for (PatientPretty patient : patients) {
+            String val = patient.getId();
+            if (val.equals(id)) {
+                for (ObservationPretty observation : observations) {
+                    if (observation.getId().equals(id)) {
+                        observationPrettyList.add(observation);
+                    }
+                }
+                for (MedicationRequestPretty medicationRequest : medicationRequests) {
+                    if (medicationRequest.getId().equals(id)) {
+                        medicationRequestPrettyList.add(medicationRequest);
+                    }
+                }
+                patient.setObservations(observationPrettyList);
+                patient.setMedicationRequests(medicationRequestPrettyList);
+                return patient;
+            }
+        }
+        return null;
+    }
+
+    public List<PatientPretty> getSearchedPatients(String search) {
+        List<PatientPretty> patients = new ArrayList<>();
+        List<PatientPretty> data = getPatients();
+        for (PatientPretty patient : data) {
+            if (
+                    patient.getName().toLowerCase().contains(search.toLowerCase())
+                            ||
+                            patient.getSurname().toLowerCase().contains(search.toLowerCase())) {
+                patients.add(patient);
+            }
+        }
+        return patients;
+    }
+
+    public PatientPretty getFilteredPatient(Filter filter) {
+        PatientPretty patient = getAllPatientInfo(filter.id);
+        List<MedicationRequestPretty> medicationRequests = patient.getMedicationRequests();
+        List<ObservationPretty> observations = patient.getObservations();
+
+        List<ObservationPretty> observationPrettyList = new ArrayList<>();
+        List<MedicationRequestPretty> medicationRequestPrettyList = new ArrayList<>();
+
+        ZonedDateTime startDate = null;
+        ZonedDateTime endDate = null;
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if (filter.getStartDate() != "") {
+            LocalDate localStartDate = LocalDate.parse(filter.getStartDate(), formatter);
+
+            startDate = localStartDate.atStartOfDay(ZoneId.systemDefault());
+        }
+        if (filter.getEndDate() != "") {
+            LocalDate localEndDate = LocalDate.parse(filter.getEndDate(), formatter);
+
+            endDate = localEndDate.atStartOfDay(ZoneId.systemDefault());
+        }
+
+        for (ObservationPretty observation : observations) {
+            if (startDate == null || observation.getDateTime().isAfter(startDate)) {
+                if (endDate == null || observation.getDateTime().isBefore(endDate)) {
+                    observationPrettyList.add(observation);
+                }
+            }
+        }
+        for (MedicationRequestPretty medicationRequest : medicationRequests) {
+            if (startDate == null || medicationRequest.getDateTime().isAfter(startDate)) {
+                if (endDate == null || medicationRequest.getDateTime().isBefore(endDate)) {
+                    medicationRequestPrettyList.add(medicationRequest);
+                }
+            }
+        }
+        patient.setObservations(observationPrettyList);
+        patient.setMedicationRequests(medicationRequestPrettyList);
+        return patient;
     }
 }

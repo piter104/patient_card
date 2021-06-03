@@ -14,17 +14,14 @@
 <header>
     <nav class="navigation">
         <a class="navigation__link navigation__link-homepage" th:href="@{/}">Strona główna</a>
-        <div class="navigation__link-position">
-            <div>
-                <a class="navigation__link" th:href="@{/}">Historia<br/>Pacjenta</a>
-            </div>
-            <div>
-                <a class="navigation__link" th:href="@{/}">Obserwacje</a>
-            </div>
-        </div>
     </nav>
 </header>
 <main>
+    <form action="#" method="post" th:object="${filter}" th:action="@{/{id}/filter (id = ${id})}">
+        <input th:field="*{startDate}" type="date"/>
+        <input th:field="*{endDate}" type="date"/>
+        <input class="page-button" type="submit" value="filtruj"/>
+    </form>
     <table class="content-table">
         <tr>
             <td style="border-right: solid 2px #342E37;"><b>Imię</b></td>
@@ -46,11 +43,13 @@
     <table class="content-table">
         <tr class="table__head">
             <th>Nazwa</th>
+            <th>Data</th>
             <th>Wartość</th>
             <th>Jednostka</th>
         </tr>
         <tr th:each="observation : ${patient?.getObservations}">
             <td th:text="${observation?.getName}">Nazwa</td>
+            <td th:text="${observation?.getToPrintDate}">Data</td>
             <td th:text="${observation?.getValue}">Wartość</td>
             <td th:text="${observation?.getUnit}">Jednostka</td>
         </tr>
@@ -66,7 +65,7 @@
         </tr>
         <tr th:each="medicationRequest : ${patient?.getMedicationRequests}">
             <td th:text="${medicationRequest?.getName}">Nazwa</td>
-            <td th:text="${medicationRequest?.getDateTime}">Data</td>
+            <td th:text="${medicationRequest?.getToPrintDate}">Data</td>
             <td th:text="${medicationRequest?.getDoseQuantity}">Ilość</td>
             <td th:text="${medicationRequest?.getFrequency}">Częstość</td>
             <td th:text="${medicationRequest?.getPeriod}">Data</td>

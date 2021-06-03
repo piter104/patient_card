@@ -14,22 +14,16 @@
 <header>
     <nav class="navigation">
         <a class="navigation__link navigation__link-homepage" th:href="@{/}">Strona główna</a>
-        <div class="navigation__link-position">
-            <div>
-                <a class="navigation__link" th:href="@{/}">Historia<br/>Pacjenta</a>
-            </div>
-            <div>
-                <a class="navigation__link" th:href="@{/}">Obserwacje</a>
-            </div>
-        </div>
     </nav>
 </header>
 
 <main>
-    <form action="#" method="post" th:action="@{/search}">
-        <input th:name="search" type="text"/>
-        <input type="submit" value="szukaj"/>
-    </form>
+    <div>
+        <form action="#" method="post" th:action="@{/search}">
+            <input class="form-input" th:name="search" type="text"/>
+            <input class="page-button" type="submit" value="szukaj"/>
+        </form>
+    </div>
     <table class="content-table">
         <tr class="table__head">
             <th>Imię</th>

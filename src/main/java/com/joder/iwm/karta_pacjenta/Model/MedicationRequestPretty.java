@@ -19,7 +19,7 @@ public class MedicationRequestPretty {
     private Integer period;
     private String periodUnit;
     private String toPrintDate;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public MedicationRequestPretty(String id, String medicationCodeableConcept, Date authoredOn, List<DosageInstructionPretty> dosageInstructions) {
         this.id = id;

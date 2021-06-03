@@ -18,9 +18,11 @@
 </header>
 <main>
     <form action="#" method="post" th:object="${filter}" th:action="@{/{id}/filter (id = ${id})}">
-        <input th:field="*{startDate}" type="date"/>
-        <input th:field="*{endDate}" type="date"/>
-        <input class="page-button" type="submit" value="filtruj"/>
+        <label>Data Początkowa</label> <br>
+        <input th:field="*{startDate}" type="date"/> <br>
+        <label>Data Końcowa</label> <br>
+        <input th:field="*{endDate}" type="date"/><br>
+        <input class="page-button" type="submit" value="filtruj"/><br>
     </form>
     <table class="content-table">
         <tr>
@@ -37,7 +39,7 @@
         </tr>
         <tr>
             <td style="border-right: solid 2px #342E37;"><b>Data Urodzenia</b></td>
-            <td th:text="${patient?.getBirthDate}">Data Urodzenia</td>
+            <td th:text="${patient?.getToPrintDate}">Data Urodzenia</td>
         </tr>
     </table>
     <table class="content-table">

@@ -2,7 +2,11 @@ package com.joder.iwm.karta_pacjenta.Model;
 
 import lombok.Data;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -11,16 +15,19 @@ public class PatientPretty {
     private String name;
     private String surname;
     private String gender;
-    private String birthDate;
+    private ZonedDateTime birthDate;
+    private String toPrintDate;
     private List<ObservationPretty> observations;
     private List<MedicationRequestPretty> medicationRequests;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public PatientPretty(String id, String name, String surname, String birthDate, String gender) {
+    public PatientPretty(String id, String name, String surname, Date birthDate, String gender) {
         this.id = id;
-        this.birthDate = birthDate;
         this.gender = gender;
         this.name = filterName(name);
         this.surname = filterName(surname);
+        this.birthDate = ZonedDateTime.ofInstant(birthDate.toInstant(), ZoneId.systemDefault());
+        this.toPrintDate = this.birthDate.format(formatter);
         this.observations = new ArrayList<>();
         this.medicationRequests = new ArrayList<>();
     }

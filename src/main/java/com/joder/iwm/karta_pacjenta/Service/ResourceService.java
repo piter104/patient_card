@@ -48,7 +48,7 @@ public class ResourceService {
                         id,
                         patient.getName().get(0).getGiven().get(0).toString(),
                         patient.getName().get(0).getFamily(),
-                        patient.getBirthDate().toString(),
+                        patient.getBirthDate(),
                         patient.getGender().toString());
                 patients.add(patientPretty);
             }

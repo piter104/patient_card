@@ -15,7 +15,7 @@ public class ObservationPretty {
     private Double value;
     private String unit;
     private String toPrintDate;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public ObservationPretty(String id, String code, DateTimeType effectiveDateTime, Quantity value) {
         this.id = id;
